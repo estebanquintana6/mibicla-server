@@ -7,11 +7,6 @@ const express_1 = require("express");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const config_1 = require("../config/config");
-// Load input validation
-const register_1 = __importDefault(require("../validation/register"));
-const login_1 = __importDefault(require("../validation/login"));
-// for the future
-// const validateChangePassword = require("../validation/changePassword");
 const router = (0, express_1.Router)();
 // Load User model
 const User_1 = __importDefault(require("../models/User"));
@@ -25,12 +20,6 @@ const userToJWTPayload_1 = require("../utils/userToJWTPayload");
  * @access Public
  */
 router.post("/register", (req, res) => {
-    // Form validation
-    const { errors, isValid } = (0, register_1.default)(req.body);
-    // Check validation
-    if (!isValid) {
-        return res.status(400).json(errors);
-    }
     const { name, last_name, email, telephone, password, } = req.body;
     let { role } = req.body;
     if (!role)
@@ -77,12 +66,8 @@ router.post("/register", (req, res) => {
  */
 router.post("/login", (req, res) => {
     // Form validation
-    const { errors, isValid } = (0, login_1.default)(req.body);
-    // Check validation
-    if (!isValid) {
-        return res.status(400).json(errors);
-    }
-    const { email, password, telephone } = req.body;
+    const { body } = req;
+    const { email, password, telephone } = body;
     // Find user by email
     User_1.default.findOne({ $or: [{ email }, { telephone }] }).populate('role').then((user) => {
         // Check if user exists
@@ -108,64 +93,7 @@ router.post("/login", (req, res) => {
             else {
                 return res
                     .status(400)
-                    .json({ passwordincorrect: "Contraseña incorrecta" });
-            }
-        });
-    });
-});
-/**
- * @route GET api/users/list
- * @desc Retrieves user JWT, so we can store user data by decrypting the JWT in the frontend
- * @params JWT token
- * @access Only authenticated users
- */
-router.get("/list", (req, res) => {
-    const headers = req.headers;
-    const token = headers.authorization.split(' ')[1];
-    if (!token)
-        return res.status(404).json();
-    jsonwebtoken_1.default.verify(token, config_1.secretKey, function (err, decoded) {
-        if (err)
-            res.status(401).json(err);
-        const role = decoded.role.name;
-    });
-});
-/**
- * @route POST api/users/changeRole
- * @desc Searches for the desired role and if
- * exists and the user requesting the action is
- * an admin, the new role is assigned to that user.
- * @params
- * token: JWT token,
- * id: userId of the user to change,
- * role: new role name to assign
- * @access Only admin users
- */
-router.post("/changeRole", (req, res) => {
-    const body = req.body;
-    const headers = req.headers;
-    const token = headers.authorization.split(' ')[1];
-    const userId = body.id;
-    const newRole = body.role;
-    Role_1.default.findOne({ name: newRole }).then((fetchedRole) => {
-        if (!fetchedRole) {
-            return res.status(404).json({ error: "Role not found" });
-        }
-        jsonwebtoken_1.default.verify(token, config_1.secretKey, function (err, decoded) {
-            if (err)
-                res.status(401);
-            const role = decoded.role.name;
-            const allowedRoles = ['SUPERADMIN', 'ADMIN'];
-            // only admins and superadmins can change role
-            if (allowedRoles.includes(role)) {
-                User_1.default.findOneAndUpdate({ _id: userId }, { role: fetchedRole }).then((err) => {
-                    if (err)
-                        res.status(304).json({ message: "El rol no se modifico" });
-                    res.status(200).json({ message: "Rol modificado" });
-                });
-            }
-            else {
-                res.status(401).json({ message: 'Forbidden' });
+                    .json({ error: "Contraseña incorrecta" });
             }
         });
     });

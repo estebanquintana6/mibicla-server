@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // requiring libraries
 const express_1 = __importDefault(require("express"));
 const mongoose_1 = __importDefault(require("mongoose"));
-const body_parser_1 = __importDefault(require("body-parser"));
 const passport_1 = __importDefault(require("passport"));
 const cors_1 = __importDefault(require("cors"));
 const { MONGO_USER, MONGO_PSWD, MONGO_URI, MONGO_PORT, MONGO_DB, MONGO_AUTH_DB } = process.env;
@@ -27,13 +26,10 @@ const seeds_1 = require("./utils/seeds");
 // Import other routes for entities
 const userRoutes_1 = __importDefault(require("./routes/userRoutes"));
 const roleRoutes_1 = __importDefault(require("./routes/roleRoutes"));
+const eventRoutes_1 = __importDefault(require("./routes/eventRoutes"));
 // Cors
 app.use((0, cors_1.default)());
-// Bodyparser middleware
-app.use(body_parser_1.default.urlencoded({
-    extended: false
-}));
-app.use(body_parser_1.default.json());
+app.use(express_1.default.json()); //Used to parse JSON bodies
 // Function to connect to the database
 const conn = () => {
     mongoose_1.default.connect(mongoUri);
@@ -62,6 +58,7 @@ app.get("/", (req, res) => {
 });
 app.use('/api/users', userRoutes_1.default);
 app.use('/api/roles', roleRoutes_1.default);
+app.use('/events', eventRoutes_1.default);
 const port = process.env.PORT || 4000;
 app.listen(port, () => console.log(`Server up and running on port ${port} in env ${process.env.NODE_ENV} !`));
 module.exports = app; // For testing
