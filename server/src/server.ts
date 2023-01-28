@@ -21,9 +21,12 @@ import { initializeDb } from "./utils/seeds";
 // Import other routes for entities
 import users from './routes/userRoutes';
 import roles from './routes/roleRoutes';
+import events from './routes/eventRoutes';
 
 // Cors
 app.use(cors());
+
+app.use(express.json()); //Used to parse JSON bodies
 
 // Function to connect to the database
 const conn = () => {
@@ -57,6 +60,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 app.use('/api/users', users);
 app.use('/api/roles', roles);
+app.use('/events', events);
 
 const port = process.env.PORT || 4000;
 
