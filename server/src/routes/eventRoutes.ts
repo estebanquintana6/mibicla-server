@@ -9,12 +9,13 @@ const router = Router();
  * @desc Get all events
  * @access Public
  */
-router.get("/", (req: Request, res: Response) => {
-    Event.find().then((data) => {
-        res.status(200).json(data);
-    }).catch((err) => {
+router.get("/", async (req: Request, res: Response) => {
+    try {
+        const events = await Event.find();
+        res.status(200).json(events);
+    } catch(err) {
         res.status(400).json(err);
-    })
+    }
 })
 
 
@@ -25,7 +26,7 @@ router.get("/", (req: Request, res: Response) => {
  * @params name, date, capacity, price
  * @access Private
  */
-router.post("/register", (req: Request, res: Response) => {
+router.post("/register", async (req: Request, res: Response) => {
     const {
         name,
         description,
@@ -48,12 +49,12 @@ router.post("/register", (req: Request, res: Response) => {
         tags,
     });
 
-    event.save().then((data) => {
+    try {
+        const data = await event.save()
         res.status(200).json(data);
-    }).catch((err) => {
+    } catch(err) {
         res.status(400).json(err);
-    });
-
+    }
 });
 
 export default router;
