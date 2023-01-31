@@ -7,56 +7,55 @@ const express_1 = require("express");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const config_1 = require("../config/config");
+const validator_1 = require("@utils/validator");
 const router = (0, express_1.Router)();
 // Load User model
 const User_1 = __importDefault(require("../models/User"));
-const Role_1 = __importDefault(require("../models/Role"));
 // Load utils
 const userToJWTPayload_1 = require("../utils/userToJWTPayload");
 /**
- * @route POST api/users/register
+ * @route POST /users/register
  * @desc Registers user
  * @params name, last_name, email, telephone, password, code (Campus Code), role (Role name)
  * @access Public
  */
 router.post("/register", (req, res) => {
-    const { name, last_name, email, telephone, password, } = req.body;
-    let { role } = req.body;
-    if (!role)
-        role = 'USUARIO';
-    Role_1.default.findOne({ name: role }).then(role => {
-        User_1.default.findOne({ $or: [{ email }, { telephone }] }).populate('role').then(user => {
-            if (user) {
-                return res.status(400).json({ email: "Ya existe un usuario con ese email o teléfono" });
-            }
-            else {
-                const newUser = new User_1.default({
-                    name,
-                    last_name,
-                    email,
-                    password,
-                    role: role._id,
-                    telephone,
-                });
-                // Hash password before saving in database
-                bcryptjs_1.default.genSalt(10, (err, salt) => {
-                    bcryptjs_1.default.hash(newUser.get('password'), salt, (err, hash) => {
-                        if (err)
-                            throw err;
-                        newUser.set('password', hash);
-                        User_1.default.create(newUser)
-                            .then(user => {
-                            return res.json(user);
+    const { name, email, password, } = req.body;
+    console.log((0, validator_1.validatePassword)(password));
+    res.status(200).send("Funciona");
+    /*
+    User.findOne({ $or: [{ email }, { telephone }] }).populate('role').then(user => {
+        if (user) {
+            return res.status(400).json({ email: "Ya existe un usuario con ese email o teléfono" });
+        } else {
+
+            const newUser = new User({
+                name,
+                last_name,
+                email,
+                password,
+                role: role._id,
+                telephone,
+            });
+
+            // Hash password before saving in database
+            bcrypt.genSalt(10, (err, salt) => {
+                bcrypt.hash(newUser.get('password'), salt, (err, hash) => {
+                    if (err) throw err;
+                    newUser.set('password', hash);
+                    User.create(newUser)
+                        .then(user => {
+                            return res.json(user)
                         })
-                            .catch(err => {
+                        .catch(err => {
                             console.log('ERR', err);
-                            res.status(500);
+                            res.status(500)
                         });
-                    });
                 });
-            }
-        });
-    });
+            });
+
+        }
+    });*/
 });
 /**
  * @route POST api/users/login

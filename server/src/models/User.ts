@@ -20,11 +20,6 @@ const UserSchema = new Schema({
     type: Date,
     default: Date.now
   },
-  role: {
-    type: Schema.Types.ObjectId,
-    ref: 'Roles',
-    required: true
-  }
 });
 
 const Users = mongoose.model('users', UserSchema);

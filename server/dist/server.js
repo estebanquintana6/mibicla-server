@@ -56,8 +56,8 @@ app.use(passport_1.default.initialize());
 app.get("/", (req, res) => {
     res.send({ msg: 'Welcome hello' });
 });
-app.use('/api/users', userRoutes_1.default);
-app.use('/api/roles', roleRoutes_1.default);
+app.use('/users', userRoutes_1.default);
+app.use('/roles', roleRoutes_1.default);
 app.use('/events', eventRoutes_1.default);
 const port = process.env.PORT || 4000;
 app.listen(port, () => console.log(`Server up and running on port ${port} in env ${process.env.NODE_ENV} !`));

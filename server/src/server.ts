@@ -58,8 +58,8 @@ app.use(passport.initialize());
 app.get("/", (req: Request, res: Response) => {
     res.send({ msg: 'Welcome hello' })
 });
-app.use('/api/users', users);
-app.use('/api/roles', roles);
+app.use('/users', users);
+app.use('/roles', roles);
 app.use('/events', events);
 
 const port = process.env.PORT || 4000;

@@ -14,6 +14,10 @@ const EventsSchema = new Schema({
         type: String,
         required: true
     },
+    place: {
+        type: String,
+        required: true
+    },
     date: {
         type: Date,
         required: true
@@ -22,9 +26,19 @@ const EventsSchema = new Schema({
         type: Number,
         required: false
     },
+    distance: {
+        type: String,
+        required: false,
+    },
     price: {
         type: Number,
+        default: 0,
         required: false
+    },
+    tags: {
+        type: [String],
+        default: [],
+        required: false,
     }
 }, {
     collection: 'Events'
