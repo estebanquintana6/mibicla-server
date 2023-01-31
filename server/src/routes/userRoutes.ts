@@ -4,72 +4,70 @@ import jwt from "jsonwebtoken";
 
 import { secretKey } from '../config/config';
 
+import {
+    validateName,
+    validatePassword,
+    validateEmail
+} from "../utils/validator";
+
+import { hashPassword, verifyPassword } from "../utils/passwordUtils"
+
 const router = Router();
 
 // Load User model
 import User from "../models/User";
-import Role from "../models/Role";
 
 // Load utils
 import { transformUserToPayload } from '../utils/userToJWTPayload';
 
-
 /**
- * @route POST api/users/register
+ * @route POST /users/register
  * @desc Registers user
  * @params name, last_name, email, telephone, password, code (Campus Code), role (Role name)
  * @access Public
  */
-router.post("/register", (req: Request, res: Response) => {
+router.post("/register", async (req: Request, res: Response) => {
 
     const {
         name,
-        last_name,
         email,
-        telephone,
         password,
     } = req.body;
 
-    let {
-        role
-    } = req.body;
+    const validPassword = validatePassword(password);
+    const validEmail = validateEmail(email);
+    const validName = validateName(name);
 
-    if (!role) role = 'USUARIO';
-
-    Role.findOne({ name: role }).then(role => {
-        User.findOne({ $or: [{ email }, { telephone }] }).populate('role').then(user => {
-            if (user) {
-                return res.status(400).json({ email: "Ya existe un usuario con ese email o teléfono" });
-            } else {
-
-                const newUser = new User({
-                    name,
-                    last_name,
-                    email,
-                    password,
-                    role: role._id,
-                    telephone,
-                });
-
-                // Hash password before saving in database
-                bcrypt.genSalt(10, (err, salt) => {
-                    bcrypt.hash(newUser.get('password'), salt, (err, hash) => {
-                        if (err) throw err;
-                        newUser.set('password', hash);
-                        User.create(newUser)
-                            .then(user => {
-                                return res.json(user)
-                            })
-                            .catch(err => {
-                                console.log('ERR', err);
-                                res.status(500)
-                            });
-                    });
-                });
-
-            }
-        });
-    });
+    if(validPassword && validEmail && validName) {
+        const userExist = await User.findOne({ email });
+        
+        if(userExist) {
+            res.status(400).json({
+                error: "Ya hay un usuario registrado con este correo"
+            });
+            return;
+        }
+        try {
+            const hashedPassword = await hashPassword(password);
+            const user = new User({
+                name,
+                email,
+                password: hashedPassword
+            })
+            const newUser = await user.save();
+            res.status(200).send(newUser);
+        } catch(err) {
+            res.status(500).send({
+                error: "Error en servidor"
+            });
+        }
+        return;
+    } else {
+        res.status(400).json({
+            error: "Datos faltantes o incorrectos"
+        })
+        return;
+    }
 });
 
 /**
