@@ -24,11 +24,6 @@ const UserSchema = new Schema({
         type: Date,
         default: Date.now
     },
-    role: {
-        type: Schema.Types.ObjectId,
-        ref: 'Roles',
-        required: true
-    }
 });
-const Users = mongoose_1.default.model('users', UserSchema);
+const Users = mongoose_1.default.model('Users', UserSchema);
 exports.default = Users;
