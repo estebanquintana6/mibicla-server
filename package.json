@@ -7,7 +7,7 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "tsc": "./node_modules/typescript/bin/tsc",
-    "build": "tsc",
+    "build": "npm run tsc",
     "postinstall": "npm run build",    
     "prestart": "npm run build",
     "test": "MONGO_DB=test NODE_ENV=test mocha src/test --exit",
