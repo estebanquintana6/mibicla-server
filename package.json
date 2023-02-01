@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
-    "build": "tsc",
+    "build": "npm run tsc",
     "prestart": "npm run build",
     "test": "MONGO_DB=test NODE_ENV=test mocha src/test --exit",
     "start": "nodemon --ignore sessions/ src/server.ts --ignore client"
