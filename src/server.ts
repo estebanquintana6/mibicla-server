@@ -4,19 +4,17 @@ import mongoose from "mongoose";
 import passport from "passport";
 import cors from "cors";
 
-const {
-    MONGO_USER,
-    MONGO_PSWD,
-    MONGO_URI,
-    MONGO_PORT,
-    MONGO_DB,
-    MONGO_AUTH_DB
-} = process.env;
+import dotenv from "dotenv";
+
+dotenv.config()
+
+const { MONGO_URI } = process.env;
 
 // Setting up modules and dependencies
 const app = express();
 // we need to make ${MONGO_DB} change when running tests
-const mongoUri = `mongodb://${MONGO_USER}:${MONGO_PSWD}@${MONGO_URI}:${MONGO_PORT}/${MONGO_DB}?authSource=${MONGO_AUTH_DB}`;
+console.log(MONGO_URI);
+const mongoUri = MONGO_URI;
 import { initializeDb } from "./utils/seeds";
 // Import other routes for entities
 import users from './routes/userRoutes';
