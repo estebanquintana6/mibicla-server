@@ -7,9 +7,11 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "tsc": "./node_modules/typescript/bin/tsc",
-    "build": "npm run tsc",
-    "test": "MONGO_DB=test NODE_ENV=test mocha src/test --exit",
-    "start": "nodemon --ignore sessions/ src/server.ts --ignore client"
+    "start": "nodemon --ignore sessions/ src/server.ts --ignore client",
+    "postinstall": "tsc",
+    "watch-node": "nodemon dist/server.js",
+    "watch-ts": "tsc -w",
+    "deploy": "git add . && git commit -m Heroku && git push heroku master"
   },
   "author": "Esteban Quintana <estebanquintana6@gmail.com>",
   "license": "ISC",
