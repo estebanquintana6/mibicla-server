@@ -17,11 +17,14 @@ const express_1 = __importDefault(require("express"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const passport_1 = __importDefault(require("passport"));
 const cors_1 = __importDefault(require("cors"));
-const { MONGO_USER, MONGO_PSWD, MONGO_URI, MONGO_PORT, MONGO_DB, MONGO_AUTH_DB } = process.env;
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
+const { MONGO_URI } = process.env;
 // Setting up modules and dependencies
 const app = (0, express_1.default)();
 // we need to make ${MONGO_DB} change when running tests
-const mongoUri = `mongodb://${MONGO_USER}:${MONGO_PSWD}@${MONGO_URI}:${MONGO_PORT}/${MONGO_DB}?authSource=${MONGO_AUTH_DB}`;
+console.log(MONGO_URI);
+const mongoUri = MONGO_URI;
 const seeds_1 = require("./utils/seeds");
 // Import other routes for entities
 const userRoutes_1 = __importDefault(require("./routes/userRoutes"));
