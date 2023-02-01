@@ -23,7 +23,6 @@ const { MONGO_URI } = process.env;
 // Setting up modules and dependencies
 const app = (0, express_1.default)();
 // we need to make ${MONGO_DB} change when running tests
-console.log(MONGO_URI);
 const mongoUri = MONGO_URI;
 const seeds_1 = require("./utils/seeds");
 // Import other routes for entities
