@@ -17,6 +17,12 @@ const router = Router();
 router.get("/", async (req: Request, res: Response) => {
     const { headers } = req;
     const { authorization } = headers;
+
+    if(!authorization) {
+        res.status(401).send("Acceso denegado");
+        return;
+    }
+
     jwt.verify(authorization, secretKey, async (err, { _id } : any) => {
         if (err) {
             res.status(401).send("Acceso denegado");
