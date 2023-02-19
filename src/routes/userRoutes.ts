@@ -14,11 +14,51 @@ import { hashPassword, verifyPassword } from "../utils/passwordUtils"
 
 const router = Router();
 
-// Load User model
 import User from "../models/User";
+import RegisterToken from "../models/RegisterToken";
 
 // Load utils
 import { transformUserToPayload } from '../utils/userToJWTPayload';
+
+
+router.post("/send_register_invitation", async (req: Request, res: Response) => {
+    const { headers } = req;
+    const { authorization } = headers;
+    
+    if (!authorization) {
+        res.status(401).send("Acceso denegado");
+        return;
+    }
+
+    const { email } = req.body;
+
+    if( !email ) {
+        res.status(400).send("Faltan datos en la petición");
+    }
+
+    jwt.verify(authorization, secretKey, async (err, { _id } : any) => {
+        if (err) {
+            res.status(401).send("Acceso denegado");
+            return;
+        }
+        
+        const user = await User.findById(_id);
+
+        if (!user || user.role !== 'SUPER_ADMIN') {
+            res.status(401).send("Acceso denegado");
+            return;
+        }
+
+        try {
+            new RegisterToken({ email }).save();
+            res.status(200).send("Invitación de registro creada");
+        } catch {
+            res.status(500).send("Error en servicio, intentar más tarde.");
+            return;
+        }
+    });
+
+});
 
 /**
  * @route POST /users/register
