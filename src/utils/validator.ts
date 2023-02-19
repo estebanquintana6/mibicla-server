@@ -15,3 +15,10 @@ export const validateEmail = (mail: string) => {
 export const validateName = (name: string) => {
     return (name || name.length !== 0 );
 }
+
+export const isAdmin = (user: { role: string}) => {
+    if (!user) {
+        return false;
+    }
+    return (user.role === "ADMIN" || user.role === "SUPER_ADMIN");
+}
