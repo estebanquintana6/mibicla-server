@@ -173,7 +173,6 @@ router.post("/login", async (req: Request, res: Response) => {
 
 router.get("/validate_register_invitation/:token", async (req: Request, res: Response) => {
     const { token } = req.params;
-    console.log("token", token);
     // http://localhost:3000/admin/registro/123
     try {
         const registerToken = await RegisterToken.findById(token);

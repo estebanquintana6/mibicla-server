@@ -1,8 +1,32 @@
 import { Router, Request, Response } from "express";
 
+import { Types } from "mongoose";
+
 import Event from '../models/Event';
 
 const router = Router();
+
+router.get("/:id", async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    if (!Types.ObjectId.isValid(id)) {
+        res.status(404).send("Evento no encontrado");
+        return;
+    }
+
+    try {
+        const event = await Event.findById(id);
+
+        if (!event) {
+            res.status(404).send("Evento no encontrado");
+            return;
+        }
+        
+        res.status(200).json(event);
+    } catch {
+        res.status(404).send("Evento no encontrado");
+    }
+});
 
 /**
  * @route GET /events
