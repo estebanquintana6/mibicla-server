@@ -14,6 +14,10 @@ const EventsSchema = new Schema({
     type: String,
     required: true
   },
+  time: {
+    type: String,
+    required: true,
+  },
   date: {
     type: Date,
     required: true
@@ -35,6 +39,19 @@ const EventsSchema = new Schema({
     type: [String],
     default: [],
     required: false,
+  },
+  difficulty: {
+    type: String,
+    enum: ["Entusiasta", "Principiante", "Intermedio", "Avanzado"],
+    required: true
+  },
+  startLat: {
+    type: Number,
+    required: true,
+  },
+  startLng: {
+    type: Number,
+    required: true
   }
 }, {
   collection: 'Events'

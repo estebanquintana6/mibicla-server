@@ -21,7 +21,7 @@ router.get("/:id", async (req: Request, res: Response) => {
             res.status(404).send("Evento no encontrado");
             return;
         }
-        
+
         res.status(200).json(event);
     } catch {
         res.status(404).send("Evento no encontrado");
@@ -60,6 +60,10 @@ router.post("/register", async (req: Request, res: Response) => {
         distance,
         price,
         tags,
+        startLat,
+        startLng,
+        difficulty,
+        time
     } = req.body;
 
     const event = new Event({
@@ -71,6 +75,10 @@ router.post("/register", async (req: Request, res: Response) => {
         distance,
         price,
         tags,
+        time,
+        startLat,
+        startLng,
+        difficulty
     });
 
     try {
