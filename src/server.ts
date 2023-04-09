@@ -25,6 +25,8 @@ import auth from './routes/authRoutes';
 app.use(cors());
 
 app.use(express.json()); //Used to parse JSON bodies
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public'))
 
 // Function to connect to the database
 const conn = () => {

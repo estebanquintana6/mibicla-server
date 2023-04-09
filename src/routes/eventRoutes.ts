@@ -4,7 +4,22 @@ import { Types } from "mongoose";
 
 import Event from '../models/Event';
 
+import multer from "multer";
+
 const router = Router();
+
+const multerStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, "public");
+    },
+    filename: (req, file, cb) => {
+        cb(null, `posters/${Date.now()}_${file.originalname}`);
+    },
+});
+
+const upload = multer({
+    storage: multerStorage
+});
 
 router.get("/:id", async (req: Request, res: Response) => {
     const { id } = req.params;
@@ -37,7 +52,7 @@ router.get("/", async (req: Request, res: Response) => {
     try {
         const events = await Event.find();
         res.status(200).json(events);
-    } catch(err) {
+    } catch (err) {
         res.status(400).json(err);
     }
 })
@@ -50,7 +65,7 @@ router.get("/", async (req: Request, res: Response) => {
  * @params name, date, capacity, price
  * @access Private
  */
-router.post("/register", async (req: Request, res: Response) => {
+router.post("/register", upload.single("poster"), async (req: Request, res: Response) => {
     const {
         name,
         description,
@@ -63,8 +78,12 @@ router.post("/register", async (req: Request, res: Response) => {
         startLat,
         startLng,
         difficulty,
-        time
+        time,
     } = req.body;
+
+    const { filename: posterUrl } = req.file;
+
+    console.log(req.file);
 
     const event = new Event({
         name,
@@ -78,13 +97,14 @@ router.post("/register", async (req: Request, res: Response) => {
         time,
         startLat,
         startLng,
-        difficulty
+        difficulty,
+        posterUrl
     });
 
     try {
         const data = await event.save()
         res.status(200).json(data);
-    } catch(err) {
+    } catch (err) {
         res.status(400).json(err);
     }
 });

@@ -52,6 +52,10 @@ const EventsSchema = new Schema({
   startLng: {
     type: Number,
     required: true
+  },
+  posterUrl: {
+    type: String,
+    required: true
   }
 }, {
   collection: 'Events'
