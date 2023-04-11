@@ -20,5 +20,21 @@ services:
       ME_CONFIG_MONGODB_SERVER: db
       ME_CONFIG_MONGODB_ADMINUSERNAME: PgFhF8vVZSa3PCPWhw2s8Nns65mhDP3mXhNkjheq
       ME_CONFIG_MONGODB_ADMINPASSWORD: PBVcuCGWkaJn7k6kRCUebUWxGERH3gDpEF4NNpp4xKp2tdQvVrr7phMZJpRtfSC8B5an5g6GWssGcCAFnQxLCW3mCV3pgMGpyEQYuwh2jdGbFKJy7patC2pf3Ca95h2J
+  web:
+      image: mibicla-backend
+      build:
+        context: .
+      command: sh -c "yarn install && npm run start"
+      environment:
+        MONGO_URI: mongodb://PgFhF8vVZSa3PCPWhw2s8Nns65mhDP3mXhNkjheq:PBVcuCGWkaJn7k6kRCUebUWxGERH3gDpEF4NNpp4xKp2tdQvVrr7phMZJpRtfSC8B5an5g6GWssGcCAFnQxLCW3mCV3pgMGpyEQYuwh2jdGbFKJy7patC2pf3Ca95h2J@db:27017/beta-db?authSource=admin
+        NODE_ENV: development
+        JWT_SECRET: fVShA9xvrKIB5nJ4TgXEKUjn0tp
+        PORT: 4000
+      volumes:
+        - .:/app/server
+      ports:
+      - "4000:4000"
+      depends_on:
+      - db
 volumes:
   beta-mongo-db:

@@ -9,6 +9,7 @@ import dotenv from "dotenv";
 dotenv.config()
 
 const { MONGO_URI } = process.env;
+console.log(MONGO_URI);
 
 // Setting up modules and dependencies
 const app = express();
