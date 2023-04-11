@@ -19,3 +19,4 @@ yarn.lock
 public/posters
 
 /dist
+node_modules
