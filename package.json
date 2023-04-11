@@ -12,7 +12,8 @@
     "postinstall": "tsc",
     "watch-node": "nodemon dist/server.js",
     "watch-ts": "tsc -w",
-    "deploy": "git add . && git commit -m Heroku && git push heroku master"
+    "deploy": "git add . && git commit -m Heroku && git push heroku master",
+    "build": "npx tsc"
   },
   "author": "Esteban Quintana <estebanquintana6@gmail.com>",
   "license": "ISC",
