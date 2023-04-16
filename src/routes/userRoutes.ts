@@ -1,8 +1,9 @@
 import { Router, Request, Response } from "express";
-import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 import { secretKey } from '../config/config';
+
+import isAdminMiddleware from "../middlewares/isAdmin";
 
 import {
     validateName,
@@ -31,18 +32,18 @@ import { transformUserToPayload } from '../utils/userToJWTPayload';
 router.get("/", async (req: Request, res: Response) => {
     const { headers } = req;
     const { authorization } = headers;
-    
+
     if (!authorization) {
         res.status(401).send("Acceso denegado");
         return;
     }
 
-    jwt.verify(authorization, secretKey, async (err, { _id } : any) => {
+    jwt.verify(authorization, secretKey, async (err, { _id }: any) => {
         if (err) {
             res.status(401).send("Acceso denegado");
             return;
         }
-        
+
         const user = await User.findById(_id);
 
         if (!user || !isAdmin(user)) {
@@ -56,7 +57,7 @@ router.get("/", async (req: Request, res: Response) => {
         } catch {
             res.status(500).send("Error en servicio. Intentar más tarde.")
         }
-        
+
     });
 });
 
@@ -75,8 +76,8 @@ router.post("/register", async (req: Request, res: Response) => {
     } = req.body;
 
     const registerToken = await RegisterToken.findById(register_token);
-    
-    if(!registerToken) {
+
+    if (!registerToken) {
         res.status(400).json({
             error: "Datos faltantes o incorrectos"
         });
@@ -97,8 +98,8 @@ router.post("/register", async (req: Request, res: Response) => {
     }
 
     const userExist = await User.findOne({ email });
-    
-    if(userExist) {
+
+    if (userExist) {
         res.status(400).json({
             error: "Ya hay un usuario registrado con este correo"
         });
@@ -115,7 +116,7 @@ router.post("/register", async (req: Request, res: Response) => {
         const newUser = await user.save();
         await registerToken.delete();
         res.status(200).json(newUser);
-    } catch(err) {
+    } catch (err) {
         res.status(500).json({
             error: "Error en servidor"
         });
@@ -176,7 +177,7 @@ router.get("/validate_register_invitation/:token", async (req: Request, res: Res
     // http://localhost:3000/admin/registro/123
     try {
         const registerToken = await RegisterToken.findById(token);
-        if(!registerToken) {
+        if (!registerToken) {
             res.status(404).send("Token no valido.");
             return;
         }
@@ -194,42 +195,20 @@ router.get("/validate_register_invitation/:token", async (req: Request, res: Res
  * @params email
  * @access Private
  */
-router.post("/send_register_invitation", async (req: Request, res: Response) => {
-    const { headers } = req;
-    const { authorization } = headers;
-    
-    if (!authorization) {
-        res.status(401).send("Acceso denegado");
-        return;
-    }
-
+router.post("/send_register_invitation", isAdminMiddleware, async (req: Request, res: Response) => {
     const { email } = req.body;
 
-    if( !email ) {
+    if (!email) {
         res.status(400).send("Faltan datos en la petición");
     }
 
-    jwt.verify(authorization, secretKey, async (err, { _id } : any) => {
-        if (err) {
-            res.status(401).send("Acceso denegado");
-            return;
-        }
-        
-        const user = await User.findById(_id);
-
-        if (!user || user.role !== 'SUPER_ADMIN') {
-            res.status(401).send("Acceso denegado");
-            return;
-        }
-
-        try {
-            new RegisterToken({ email }).save();
-            res.status(200).send("Invitación de registro creada");
-        } catch {
-            res.status(500).send("Error en servicio, intentar más tarde.");
-            return;
-        }
-    });
+    try {
+        new RegisterToken({ email }).save();
+        res.status(200).send("Invitación de registro creada");
+    } catch {
+        res.status(500).send("Error en servicio, intentar más tarde.");
+        return;
+    }
 
 });
 

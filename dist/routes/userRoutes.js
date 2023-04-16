@@ -18,10 +18,42 @@ const config_1 = require("../config/config");
 const validator_1 = require("../utils/validator");
 const passwordUtils_1 = require("../utils/passwordUtils");
 const router = (0, express_1.Router)();
-// Load User model
 const User_1 = __importDefault(require("../models/User"));
+const RegisterToken_1 = __importDefault(require("../models/RegisterToken"));
 // Load utils
 const userToJWTPayload_1 = require("../utils/userToJWTPayload");
+/**
+ * @route GET /users
+ * @desc Send Admin Invitation user
+ * @params email
+ * @access Private
+ */
+router.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { headers } = req;
+    const { authorization } = headers;
+    if (!authorization) {
+        res.status(401).send("Acceso denegado");
+        return;
+    }
+    jsonwebtoken_1.default.verify(authorization, config_1.secretKey, (err, { _id }) => __awaiter(void 0, void 0, void 0, function* () {
+        if (err) {
+            res.status(401).send("Acceso denegado");
+            return;
+        }
+        const user = yield User_1.default.findById(_id);
+        if (!user || !(0, validator_1.isAdmin)(user)) {
+            res.status(401).send("Acceso denegado");
+            return;
+        }
+        try {
+            const users = yield User_1.default.find({}).select(["-password"]);
+            res.status(200).send(users);
+        }
+        catch (_a) {
+            res.status(500).send("Error en servicio. Intentar más tarde.");
+        }
+    }));
+}));
 /**
  * @route POST /users/register
  * @desc Registers user
@@ -29,7 +61,15 @@ const userToJWTPayload_1 = require("../utils/userToJWTPayload");
  * @access Public
  */
 router.post("/register", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name, email, password, } = req.body;
+    const { name, password, register_token, } = req.body;
+    const registerToken = yield RegisterToken_1.default.findById(register_token);
+    if (!registerToken) {
+        res.status(400).json({
+            error: "Datos faltantes o incorrectos"
+        });
+        return;
+    }
+    const { email } = registerToken;
     const validPassword = (0, validator_1.validatePassword)(password);
     const validEmail = (0, validator_1.validateEmail)(email);
     const validName = (0, validator_1.validateName)(name);
@@ -54,6 +94,7 @@ router.post("/register", (req, res) => __awaiter(void 0, void 0, void 0, functio
             password: hashedPassword
         });
         const newUser = yield user.save();
+        yield registerToken.delete();
         res.status(200).json(newUser);
     }
     catch (err) {
@@ -71,7 +112,6 @@ router.post("/register", (req, res) => __awaiter(void 0, void 0, void 0, functio
  */
 router.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = req.body;
-    ;
     const user = yield User_1.default.findOne({ email });
     if (!user) {
         res.status(400).json({
@@ -96,5 +136,64 @@ router.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* 
         res.status(400).json({ error: "Datos incorrectos" });
         return;
     }
+}));
+/**
+ * @route POST /users/validate_register_invitation
+ * @desc Validate register token
+ * @params token
+ * @access Public
+ */
+router.get("/validate_register_invitation/:token", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { token } = req.params;
+    // http://localhost:3000/admin/registro/123
+    try {
+        const registerToken = yield RegisterToken_1.default.findById(token);
+        if (!registerToken) {
+            res.status(404).send("Token no valido.");
+            return;
+        }
+        res.status(200).send(registerToken.email);
+        return;
+    }
+    catch (err) {
+        res.status(404).send("Token no valido.");
+    }
+}));
+/**
+ * @route POST /users/send_register_invitation
+ * @desc Send Admin Invitation user
+ * @params email
+ * @access Private
+ */
+router.post("/send_register_invitation", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { headers } = req;
+    const { authorization } = headers;
+    if (!authorization) {
+        res.status(401).send("Acceso denegado");
+        return;
+    }
+    const { email } = req.body;
+    if (!email) {
+        res.status(400).send("Faltan datos en la petición");
+    }
+    jsonwebtoken_1.default.verify(authorization, config_1.secretKey, (err, { _id }) => __awaiter(void 0, void 0, void 0, function* () {
+        if (err) {
+            res.status(401).send("Acceso denegado");
+            return;
+        }
+        const user = yield User_1.default.findById(_id);
+        if (!user || user.role !== 'SUPER_ADMIN') {
+            res.status(401).send("Acceso denegado");
+            return;
+        }
+        try {
+            new RegisterToken_1.default({ email }).save();
+            res.status(200).send("Invitación de registro creada");
+        }
+        catch (_b) {
+            res.status(500).send("Error en servicio, intentar más tarde.");
+            return;
+        }
+    }));
 }));
 exports.default = router;

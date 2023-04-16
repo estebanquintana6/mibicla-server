@@ -22,9 +22,10 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: PBVcuCGWkaJn7k6kRCUebUWxGERH3gDpEF4NNpp4xKp2tdQvVrr7phMZJpRtfSC8B5an5g6GWssGcCAFnQxLCW3mCV3pgMGpyEQYuwh2jdGbFKJy7patC2pf3Ca95h2J
   web:
       image: mibicla-backend
+      restart: always
       build:
         context: .
-      command: sh -c "yarn install && npm run start"
+      command: sh -c "yarn install && npm run dev-start"
       environment:
         MONGO_URI: mongodb://PgFhF8vVZSa3PCPWhw2s8Nns65mhDP3mXhNkjheq:PBVcuCGWkaJn7k6kRCUebUWxGERH3gDpEF4NNpp4xKp2tdQvVrr7phMZJpRtfSC8B5an5g6GWssGcCAFnQxLCW3mCV3pgMGpyEQYuwh2jdGbFKJy7patC2pf3Ca95h2J@db:27017/beta-db?authSource=admin
         NODE_ENV: development

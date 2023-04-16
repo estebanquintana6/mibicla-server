@@ -13,14 +13,46 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
+const mongoose_1 = require("mongoose");
 const Event_1 = __importDefault(require("../models/Event"));
+const multer_1 = __importDefault(require("multer"));
 const router = (0, express_1.Router)();
+const multerStorage = multer_1.default.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, "public");
+    },
+    filename: (req, file, cb) => {
+        cb(null, `posters/${Date.now()}_${file.originalname}`);
+    },
+});
+const upload = (0, multer_1.default)({
+    storage: multerStorage
+});
+router.get("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    if (!mongoose_1.Types.ObjectId.isValid(id)) {
+        res.status(404).send("Evento no encontrado");
+        return;
+    }
+    try {
+        const event = yield Event_1.default.findById(id);
+        if (!event) {
+            res.status(404).send("Evento no encontrado");
+            return;
+        }
+        res.status(200).json(event);
+    }
+    catch (_a) {
+        res.status(404).send("Evento no encontrado");
+    }
+}));
 /**
  * @route GET /events
  * @desc Get all events
  * @access Public
  */
 router.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("here");
     try {
         const events = yield Event_1.default.find();
         res.status(200).json(events);
@@ -35,8 +67,9 @@ router.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
  * @params name, date, capacity, price
  * @access Private
  */
-router.post("/register", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name, description, place, date, capacity, distance, price, tags, } = req.body;
+router.post("/register", upload.single("poster"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { name, description, place, date, capacity, distance, price, tags, startLat, startLng, difficulty, time, } = req.body;
+    const { filename: posterUrl } = req.file;
     const event = new Event_1.default({
         name,
         description,
@@ -46,6 +79,11 @@ router.post("/register", (req, res) => __awaiter(void 0, void 0, void 0, functio
         distance,
         price,
         tags,
+        time,
+        startLat,
+        startLng,
+        difficulty,
+        posterUrl
     });
     try {
         const data = yield event.save();

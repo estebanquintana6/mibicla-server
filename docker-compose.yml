@@ -11,11 +11,14 @@ services:
     - beta-mongo-db:/data/db
   web:
     image: $CI_REGISTRY_IMAGE:$CI_TAG
+    restart: always
     environment:
       MONGO_URI: mongodb://PgFhF8vVZSa3PCPWhw2s8Nns65mhDP3mXhNkjheq:PBVcuCGWkaJn7k6kRCUebUWxGERH3gDpEF4NNpp4xKp2tdQvVrr7phMZJpRtfSC8B5an5g6GWssGcCAFnQxLCW3mCV3pgMGpyEQYuwh2jdGbFKJy7patC2pf3Ca95h2J@db:27017/beta-db?authSource=admin
       NODE_ENV: development
       JWT_SECRET: fVShA9xvrKIB5nJ4TgXEKUjn0tp
       PORT: 4000
+    volumes:
+      - .:/app/server
     ports:
     - "$NODE_PORT:4000"
     depends_on:

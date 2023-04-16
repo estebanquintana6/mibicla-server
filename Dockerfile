@@ -17,6 +17,4 @@ WORKDIR /app/server
 # Copy the server from the build container
 COPY --from=builder /app/server /app/server
 
-RUN npm install --only=production && npm cache clean --force && npm install -g typescript
-
 CMD ["node", "./src/server.ts"]

@@ -20,3 +20,6 @@ public/posters
 
 /dist
 node_modules
+
+docker-compose.local.yml
+docker-compose.yml

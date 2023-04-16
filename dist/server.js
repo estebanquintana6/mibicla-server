@@ -20,6 +20,7 @@ const cors_1 = __importDefault(require("cors"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const { MONGO_URI } = process.env;
+console.log(MONGO_URI);
 // Setting up modules and dependencies
 const app = (0, express_1.default)();
 // we need to make ${MONGO_DB} change when running tests
@@ -29,9 +30,12 @@ const seeds_1 = require("./utils/seeds");
 const userRoutes_1 = __importDefault(require("./routes/userRoutes"));
 const roleRoutes_1 = __importDefault(require("./routes/roleRoutes"));
 const eventRoutes_1 = __importDefault(require("./routes/eventRoutes"));
+const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
 // Cors
 app.use((0, cors_1.default)());
 app.use(express_1.default.json()); //Used to parse JSON bodies
+app.use(express_1.default.urlencoded({ extended: true }));
+app.use(express_1.default.static('public'));
 // Function to connect to the database
 const conn = () => {
     mongoose_1.default.connect(mongoUri);
@@ -61,6 +65,7 @@ app.get("/", (req, res) => {
 app.use('/users', userRoutes_1.default);
 app.use('/roles', roleRoutes_1.default);
 app.use('/events', eventRoutes_1.default);
+app.use('/auth', authRoutes_1.default);
 const port = process.env.PORT || 4000;
 app.listen(port, () => console.log(`Server up and running on port ${port} in env ${process.env.NODE_ENV} !`));
 module.exports = app; // For testing

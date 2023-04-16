@@ -5,6 +5,7 @@ import { Types } from "mongoose";
 import Event from '../models/Event';
 
 import multer from "multer";
+import isAdmin from "../middlewares/isAdmin";
 
 const router = Router();
 
@@ -58,14 +59,13 @@ router.get("/", async (req: Request, res: Response) => {
 })
 
 
-
 /**
  * @route POST /events/register
  * @desc Create a new event
  * @params name, date, capacity, price
  * @access Private
  */
-router.post("/register", upload.single("poster"), async (req: Request, res: Response) => {
+router.post("/register", upload.single("poster"), isAdmin, async (req: Request, res: Response) => {
     const {
         name,
         description,
@@ -82,8 +82,6 @@ router.post("/register", upload.single("poster"), async (req: Request, res: Resp
     } = req.body;
 
     const { filename: posterUrl } = req.file;
-
-    console.log(req.file);
 
     const event = new Event({
         name,
