@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const config_1 = require("../config/config");
+const isAdmin_1 = __importDefault(require("../middlewares/isAdmin"));
 const validator_1 = require("../utils/validator");
 const passwordUtils_1 = require("../utils/passwordUtils");
 const router = (0, express_1.Router)();
@@ -165,35 +166,18 @@ router.get("/validate_register_invitation/:token", (req, res) => __awaiter(void 
  * @params email
  * @access Private
  */
-router.post("/send_register_invitation", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { headers } = req;
-    const { authorization } = headers;
-    if (!authorization) {
-        res.status(401).send("Acceso denegado");
-        return;
-    }
+router.post("/send_register_invitation", isAdmin_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email } = req.body;
     if (!email) {
         res.status(400).send("Faltan datos en la petición");
     }
-    jsonwebtoken_1.default.verify(authorization, config_1.secretKey, (err, { _id }) => __awaiter(void 0, void 0, void 0, function* () {
-        if (err) {
-            res.status(401).send("Acceso denegado");
-            return;
-        }
-        const user = yield User_1.default.findById(_id);
-        if (!user || user.role !== 'SUPER_ADMIN') {
-            res.status(401).send("Acceso denegado");
-            return;
-        }
-        try {
-            new RegisterToken_1.default({ email }).save();
-            res.status(200).send("Invitación de registro creada");
-        }
-        catch (_b) {
-            res.status(500).send("Error en servicio, intentar más tarde.");
-            return;
-        }
-    }));
+    try {
+        new RegisterToken_1.default({ email }).save();
+        res.status(200).send("Invitación de registro creada");
+    }
+    catch (_b) {
+        res.status(500).send("Error en servicio, intentar más tarde.");
+        return;
+    }
 }));
 exports.default = router;

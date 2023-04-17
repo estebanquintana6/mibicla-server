@@ -16,6 +16,7 @@ const express_1 = require("express");
 const mongoose_1 = require("mongoose");
 const Event_1 = __importDefault(require("../models/Event"));
 const multer_1 = __importDefault(require("multer"));
+const isAdmin_1 = __importDefault(require("../middlewares/isAdmin"));
 const router = (0, express_1.Router)();
 const multerStorage = multer_1.default.diskStorage({
     destination: (req, file, cb) => {
@@ -52,7 +53,6 @@ router.get("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () 
  * @access Public
  */
 router.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("here");
     try {
         const events = yield Event_1.default.find();
         res.status(200).json(events);
@@ -67,7 +67,7 @@ router.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
  * @params name, date, capacity, price
  * @access Private
  */
-router.post("/register", upload.single("poster"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post("/register", upload.single("poster"), isAdmin_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, description, place, date, capacity, distance, price, tags, startLat, startLng, difficulty, time, } = req.body;
     const { filename: posterUrl } = req.file;
     const event = new Event_1.default({

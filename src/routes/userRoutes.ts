@@ -9,7 +9,6 @@ import {
     validateName,
     validatePassword,
     validateEmail,
-    isAdmin
 } from "../utils/validator";
 
 import { hashPassword, verifyPassword } from "../utils/passwordUtils"
@@ -29,36 +28,13 @@ import { transformUserToPayload } from '../utils/userToJWTPayload';
  * @params email
  * @access Private
  */
-router.get("/", async (req: Request, res: Response) => {
-    const { headers } = req;
-    const { authorization } = headers;
-
-    if (!authorization) {
-        res.status(401).send("Acceso denegado");
-        return;
+router.get("/", isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+        const users = await User.find({}).select(["-password"]);
+        res.status(200).send(users);
+    } catch {
+        res.status(500).send("Error en servicio. Intentar más tarde.")
     }
-
-    jwt.verify(authorization, secretKey, async (err, { _id }: any) => {
-        if (err) {
-            res.status(401).send("Acceso denegado");
-            return;
-        }
-
-        const user = await User.findById(_id);
-
-        if (!user || !isAdmin(user)) {
-            res.status(401).send("Acceso denegado");
-            return;
-        }
-
-        try {
-            const users = await User.find({}).select(["-password"]);
-            res.status(200).send(users);
-        } catch {
-            res.status(500).send("Error en servicio. Intentar más tarde.")
-        }
-
-    });
 });
 
 /**

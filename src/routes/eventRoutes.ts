@@ -5,7 +5,7 @@ import { Types } from "mongoose";
 import Event from '../models/Event';
 
 import multer from "multer";
-import isAdmin from "../middlewares/isAdmin";
+import isAdminMiddleware from "../middlewares/isAdmin";
 
 const router = Router();
 
@@ -65,7 +65,7 @@ router.get("/", async (req: Request, res: Response) => {
  * @params name, date, capacity, price
  * @access Private
  */
-router.post("/register", upload.single("poster"), isAdmin, async (req: Request, res: Response) => {
+router.post("/register", upload.single("poster"), isAdminMiddleware, async (req: Request, res: Response) => {
     const {
         name,
         description,
@@ -104,6 +104,25 @@ router.post("/register", upload.single("poster"), isAdmin, async (req: Request, 
         res.status(200).json(data);
     } catch (err) {
         res.status(400).json(err);
+    }
+});
+
+/**
+ * @route DELETE /events/delete
+ * @desc Delte an event by id
+ * @params _id
+ * @access Private
+ */
+router.delete("/delete/:id", upload.single("poster"), isAdminMiddleware, async (req: Request, res: Response) => {
+    const { params } = req;
+    const { id } = params;
+
+    try {
+        const event = await Event.findById(id);
+        await event.deleteOne();
+        res.status(200).send(`El evento con id ${id} ha sido eliminado`);
+    } catch {
+        res.status(500).send("Error en servicio. Intentar más tarde.")
     }
 });
 
