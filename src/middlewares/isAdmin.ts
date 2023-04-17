@@ -10,6 +10,7 @@ const isAdmin = (req: Request, res: Response, next: () => void) => {
 
     if(!authorization) {
         res.status(401).send("Acceso denegado");
+        return;
     }
 
     try {
@@ -19,9 +20,11 @@ const isAdmin = (req: Request, res: Response, next: () => void) => {
             return next();
         } else {
             res.status(401).send("Acceso denegado");
+            return;
         }
     } catch(err) {
         res.status(500).send("Fallo en servidor. Intentar más tarde.");
+        return;
     }
 }
 
