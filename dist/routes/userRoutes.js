@@ -29,31 +29,14 @@ const userToJWTPayload_1 = require("../utils/userToJWTPayload");
  * @params email
  * @access Private
  */
-router.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { headers } = req;
-    const { authorization } = headers;
-    if (!authorization) {
-        res.status(401).send("Acceso denegado");
-        return;
+router.get("/", isAdmin_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const users = yield User_1.default.find({}).select(["-password"]);
+        res.status(200).send(users);
     }
-    jsonwebtoken_1.default.verify(authorization, config_1.secretKey, (err, { _id }) => __awaiter(void 0, void 0, void 0, function* () {
-        if (err) {
-            res.status(401).send("Acceso denegado");
-            return;
-        }
-        const user = yield User_1.default.findById(_id);
-        if (!user || !(0, validator_1.isAdmin)(user)) {
-            res.status(401).send("Acceso denegado");
-            return;
-        }
-        try {
-            const users = yield User_1.default.find({}).select(["-password"]);
-            res.status(200).send(users);
-        }
-        catch (_a) {
-            res.status(500).send("Error en servicio. Intentar más tarde.");
-        }
-    }));
+    catch (_a) {
+        res.status(500).send("Error en servicio. Intentar más tarde.");
+    }
 }));
 /**
  * @route POST /users/register
