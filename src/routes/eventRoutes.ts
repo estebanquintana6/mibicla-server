@@ -108,6 +108,35 @@ router.post("/register", upload.single("poster"), isAdminMiddleware, async (req:
 });
 
 /**
+ * @route POST /events/update
+ * @desc Update an event
+ */
+router.post("/update", upload.single("poster"), isAdminMiddleware, async (req: Request, res: Response) => {
+    const {
+        _id,
+        poster,
+        ...eventData
+    } = req.body;
+
+    const event = await Event.findById(_id);
+
+    if (!event) {
+        res.status(404).send("Evento no encontrado");
+        return;
+    }
+
+    // TO-DO: Update poster data (delete previous images if they are updated )
+
+    const { acknowledged } = await event.update(eventData);
+    
+    if (acknowledged) {
+        res.status(200).send("Evento modificado");
+    } else {
+        res.status(500).send("El evento no se ha modificado.")
+    }
+});
+
+/**
  * @route DELETE /events/delete
  * @desc Delte an event by id
  * @params _id
