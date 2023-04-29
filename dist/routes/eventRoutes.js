@@ -93,4 +93,22 @@ router.post("/register", upload.single("poster"), isAdmin_1.default, (req, res) 
         res.status(400).json(err);
     }
 }));
+/**
+ * @route DELETE /events/delete
+ * @desc Delte an event by id
+ * @params _id
+ * @access Private
+ */
+router.delete("/delete/:id", upload.single("poster"), isAdmin_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { params } = req;
+    const { id } = params;
+    try {
+        const event = yield Event_1.default.findById(id);
+        yield event.deleteOne();
+        res.status(200).send(`El evento con id ${id} ha sido eliminado`);
+    }
+    catch (_b) {
+        res.status(500).send("Error en servicio. Intentar más tarde.");
+    }
+}));
 exports.default = router;
