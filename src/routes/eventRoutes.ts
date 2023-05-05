@@ -142,7 +142,7 @@ router.post("/update", upload.single("poster"), isAdminMiddleware, async (req: R
  * @params _id
  * @access Private
  */
-router.delete("/delete/:id", upload.single("poster"), isAdminMiddleware, async (req: Request, res: Response) => {
+router.delete("/delete/:id", isAdminMiddleware, async (req: Request, res: Response) => {
     const { params } = req;
     const { id } = params;
 
