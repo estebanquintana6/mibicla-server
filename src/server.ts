@@ -21,6 +21,7 @@ import users from './routes/userRoutes';
 import roles from './routes/roleRoutes';
 import events from './routes/eventRoutes';
 import categories from './routes/categoryRoutes';
+import brands from './routes/brandRoutes';
 import auth from './routes/authRoutes';
 
 // Cors
@@ -64,6 +65,7 @@ app.use('/users', users);
 app.use('/roles', roles);
 app.use('/events', events);
 app.use('/category', categories);
+app.use('/brands', brands);
 app.use('/auth', auth);
 
 const port = process.env.PORT || 4000;
